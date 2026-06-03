@@ -18,16 +18,16 @@ if (logo) {
     };
 
     const moveNeedles = (time) => {
-      state.currentX += (state.targetX - state.currentX) * 0.14;
-      state.currentY += (state.targetY - state.currentY) * 0.14;
+      state.currentX += (state.targetX - state.currentX) * 0.13;
+      state.currentY += (state.targetY - state.currentY) * 0.13;
 
       clusters.forEach((cluster) => {
         const depth = Number(cluster.dataset.depth || 1);
         const phase = Number(cluster.dataset.phase || 0);
-        const pulse = Math.sin(time * 0.0015 + phase * Math.PI) * 0.32;
-        const tx = state.currentX * 3.4 * depth + pulse;
-        const ty = state.currentY * 1.8 * depth - Math.abs(state.currentX) * 0.35;
-        const rotate = state.currentX * 2.4 * depth + state.currentY * 0.7 + pulse;
+        const pulse = Math.sin(time * 0.0014 + phase * Math.PI) * 0.28;
+        const tx = state.currentX * 3.2 * depth + pulse;
+        const ty = state.currentY * 1.5 * depth - Math.abs(state.currentX) * 0.32;
+        const rotate = state.currentX * 2.2 * depth + state.currentY * 0.58 + pulse;
 
         cluster.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${rotate}deg)`;
       });

@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.1 — 2026-06-03
+
+Hero design correction after first Vercel preview.
+
+### Changed
+
+- Replaced the fragile PNG-based hero logo with an inline SVG umbrella pine mark
+- Removed the broken image behavior seen on the deployed site
+- Made the tree feel more complete with still trunk/branch strokes and animated needle clusters
+- Tightened hero spacing and added a simple top navigation
+- Updated hero copy to position this as an Instant Lead private test website
+
 ## v0.1.0 — 2026-06-03
 
 Initial private testing version.

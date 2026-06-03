@@ -2,7 +2,7 @@
 
 ## Current Version
 
-**v0.1.0 — Starter static website**
+**v0.1.1 — Hero redesign and logo rendering fix**
 
 ## Currently Uploaded
 
@@ -10,13 +10,14 @@ Not confirmed yet. After the first GitHub upload, update this section with the G
 
 ## Working On Now
 
-Preparing the private GitHub project structure for Instant Lead testing.
+Polishing the Kasamatsu hero design and fixing the deployed logo rendering.
 
 ## Current Website State
 
 - Static HTML/CSS/JavaScript website
 - Kasamatsu restaurant landing page
-- Animated logo needle overlay on desktop hover
+- Inline SVG umbrella pine logo
+- Animated pine needle clusters on desktop hover
 - Reservation form currently shows a local success message only
 - No real booking storage, email sending, AI chatbot, or backend yet
 

@@ -4,12 +4,12 @@ Private testing website for Instant Lead, featuring the Kasamatsu Japanese resta
 
 ## Current Version
 
-**v0.1.0 — Starter static website**
+**v0.1.1 — Hero redesign and logo rendering fix**
 
 This version includes the first premium restaurant landing page:
 
-- Centered Kasamatsu logo and Japanese kana
-- Subtle animated pine-needle overlay on desktop hover
+- Centered inline SVG Kasamatsu tree mark and Japanese kana
+- Subtle animated pine-needle clusters on desktop hover
 - Concept, menu preview, location, reservation, and footer sections
 - Static reservation form with a clean success message
 - Mobile-responsive layout
