@@ -1,6 +1,14 @@
 const logo = document.querySelector("[data-logo-breeze]");
 const form = document.querySelector("[data-reservation-form]");
 const formStatus = document.querySelector("[data-form-status]");
+const chatForm = document.querySelector("[data-chat-form]");
+const chatInput = document.querySelector("#assistant-input");
+const chatMessages = document.querySelector("[data-chat-messages]");
+const chatConnection = document.querySelector("[data-chat-connection]");
+const chatLauncher = document.querySelector("[data-chat-launcher]");
+const promptButtons = [...document.querySelectorAll("[data-chat-prompt]")];
+
+const chatHistory = [];
 
 if (logo) {
   const canAnimate =
@@ -70,10 +78,149 @@ if (logo) {
   }
 }
 
+const today = new Date().toISOString().split("T")[0];
+const dateInput = document.querySelector("#date");
+
+if (dateInput) {
+  dateInput.min = today;
+}
+
+const setChatBusy = (isBusy) => {
+  if (chatInput) {
+    chatInput.disabled = isBusy;
+  }
+
+  promptButtons.forEach((button) => {
+    button.disabled = isBusy;
+  });
+
+  if (chatConnection) {
+    chatConnection.textContent = isBusy ? "Thinking" : "Ready";
+  }
+};
+
+const scrollChatToBottom = () => {
+  if (chatMessages) {
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+};
+
+const addChatMessage = (role, content) => {
+  if (!chatMessages || !content) return;
+
+  const message = document.createElement("div");
+  message.className = `assistant-message assistant-message-${role}`;
+  message.textContent = content;
+  chatMessages.appendChild(message);
+  scrollChatToBottom();
+};
+
+const openAssistant = () => {
+  const assistant = document.querySelector("#assistant");
+
+  if (assistant) {
+    assistant.scrollIntoView({ behavior: "smooth", block: "start" });
+  }
+
+  window.setTimeout(() => {
+    chatInput?.focus();
+  }, 420);
+};
+
+const sendChatMessage = async (content) => {
+  const message = content.trim();
+  if (!message) return;
+
+  addChatMessage("user", message);
+  chatHistory.push({ role: "user", content: message });
+  setChatBusy(true);
+
+  try {
+    const response = await fetch("/api/chat", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messages: chatHistory.slice(-12),
+      }),
+    });
+
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+      throw new Error(data.error || "The assistant could not respond.");
+    }
+
+    const reply =
+      data.reply ||
+      "I received that. Please share the date, time, guest count, and any special request.";
+
+    addChatMessage("bot", reply);
+    chatHistory.push({ role: "assistant", content: reply });
+  } catch (error) {
+    addChatMessage(
+      "system",
+      window.location.protocol === "file:"
+        ? "The real assistant works after the site is deployed on Vercel, because it needs the /api/chat backend."
+        : "The assistant is not connected yet. Please check the OpenAI and Supabase environment variables in Vercel."
+    );
+  } finally {
+    setChatBusy(false);
+  }
+};
+
+if (chatForm && chatInput) {
+  chatForm.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const message = chatInput.value;
+    chatInput.value = "";
+    sendChatMessage(message);
+  });
+}
+
+promptButtons.forEach((button) => {
+  button.addEventListener("click", () => {
+    openAssistant();
+    sendChatMessage(button.dataset.chatPrompt || "");
+  });
+});
+
+if (chatLauncher) {
+  chatLauncher.addEventListener("click", openAssistant);
+}
+
 if (form && formStatus) {
   form.addEventListener("submit", (event) => {
     event.preventDefault();
-    formStatus.textContent = "Thank you. Your request has been received.";
-    form.reset();
+
+    const formData = new FormData(form);
+    const details = {
+      name: formData.get("name"),
+      email: formData.get("email"),
+      phone: formData.get("phone"),
+      date: formData.get("date"),
+      time: formData.get("time"),
+      guests: formData.get("guests"),
+      message: formData.get("message"),
+    };
+
+    const prompt = [
+      "I would like to request a reservation.",
+      `Name: ${details.name || "Not provided"}.`,
+      `Email: ${details.email || "Not provided"}.`,
+      details.phone ? `Phone: ${details.phone}.` : "",
+      `Date: ${details.date || "Not provided"}.`,
+      `Time: ${details.time || "Not provided"}.`,
+      `Guests: ${details.guests || "Not provided"}.`,
+      details.message ? `Special request: ${details.message}.` : "",
+      "If there is availability, please create the reservation and tell me the table details.",
+    ]
+      .filter(Boolean)
+      .join(" ");
+
+    formStatus.textContent = "Opening the booking assistant with your request.";
+    openAssistant();
+    sendChatMessage(prompt);
   });
 }

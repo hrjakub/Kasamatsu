@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta
       name="description"
-      content="Private testing website for Instant Lead, featuring the Kasamatsu restaurant concept and future AI booking assistant prototype."
+      content="Private testing website for Instant Lead, featuring the Kasamatsu restaurant concept and AI booking assistant prototype."
     />
     <title>Kasamatsu | Instant Lead Test Website</title>
     <link rel="stylesheet" href="style.css" />
@@ -19,6 +19,7 @@
       <nav>
         <a href="#concept">Concept</a>
         <a href="#menu">Menu</a>
+        <a href="#assistant">Assistant</a>
         <a href="#reservation">Reserve</a>
       </nav>
     </header>
@@ -206,8 +207,8 @@
             <p class="eyebrow">Reservation</p>
             <h2 id="reservation-title">Request a table.</h2>
             <p class="reservation-note">
-              The future Instant Lead assistant will help guests choose a time,
-              share notes, and communicate special requests.
+              The Instant Lead assistant can help guests choose a time, share
+              notes, and communicate special requests.
             </p>
           </div>
 
@@ -226,6 +227,12 @@
                 <input id="date" name="date" type="date" required />
               </div>
               <div class="field">
+                <label for="time">Time</label>
+                <input id="time" name="time" type="time" required />
+              </div>
+            </div>
+            <div class="field-row">
+              <div class="field">
                 <label for="guests">Guests</label>
                 <input
                   id="guests"
@@ -237,17 +244,96 @@
                   required
                 />
               </div>
+              <div class="field">
+                <label for="phone">Phone</label>
+                <input id="phone" name="phone" type="tel" autocomplete="tel" />
+              </div>
             </div>
             <div class="field">
               <label for="message">Message</label>
               <textarea id="message" name="message" rows="4"></textarea>
             </div>
-            <button class="button primary form-button" type="submit">Send request</button>
+            <button class="button primary form-button" type="submit">Ask assistant</button>
             <p class="form-status" data-form-status role="status" aria-live="polite"></p>
           </form>
         </div>
       </section>
+
+      <section
+        class="section assistant-section"
+        id="assistant"
+        aria-labelledby="assistant-title"
+      >
+        <div class="section-inner assistant-layout">
+          <div>
+            <p class="eyebrow">AI Booking Assistant</p>
+            <h2 id="assistant-title">Reserve through a calmer conversation.</h2>
+            <p class="assistant-note">
+              Ask about availability, preferred tables, birthday touches,
+              champagne, cakes, dietary notes, or anything the team should know
+              before confirming the evening.
+            </p>
+          </div>
+
+          <div class="assistant-card" data-chat-shell>
+            <div class="assistant-card-header">
+              <div>
+                <p>Kasamatsu Assistant</p>
+                <span>Table requests, availability, and special occasions</span>
+              </div>
+              <span class="assistant-status" data-chat-connection>Ready</span>
+            </div>
+
+            <div
+              class="assistant-messages"
+              data-chat-messages
+              aria-live="polite"
+              aria-label="Booking assistant messages"
+            >
+              <div class="assistant-message assistant-message-bot">
+                Good evening. I can help with table availability, special
+                requests, and booking details. What date and time would you
+                like?
+              </div>
+            </div>
+
+            <div class="assistant-prompts" aria-label="Suggested messages">
+              <button type="button" data-chat-prompt="Book a table for two tomorrow at 20:00.">
+                Table for two
+              </button>
+              <button type="button" data-chat-prompt="Can I request the most romantic table with champagne?">
+                Special occasion
+              </button>
+              <button type="button" data-chat-prompt="What is the best table for four people?">
+                Best table
+              </button>
+            </div>
+
+            <form class="assistant-input-row" data-chat-form>
+              <label class="visually-hidden" for="assistant-input">Message</label>
+              <input
+                id="assistant-input"
+                name="message"
+                type="text"
+                autocomplete="off"
+                placeholder="Ask for a table, time, or special request"
+                required
+              />
+              <button class="button primary" type="submit">Send</button>
+            </form>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <button
+      class="assistant-launcher"
+      type="button"
+      data-chat-launcher
+      aria-label="Open booking assistant"
+    >
+      <span></span>
+    </button>
 
     <footer class="site-footer">
       <p>KASAMATSU <span lang="ja">カサマツ</span></p>
