@@ -9,35 +9,50 @@ Status: Complete
 - Add static reservation form
 - Prepare GitHub documentation
 
-## v0.2.0 — Instant Lead Booking Assistant Prototype
+## v0.2.0 — First Practical AI Booking Assistant
+
+Status: Complete locally, ready for GitHub/Vercel/Supabase setup
+
+- Add AI booking assistant interface
+- Add Vercel backend endpoint
+- Add OpenAI tool-calling reservation flow
+- Add Supabase reservation database schema
+- Seed 10 restaurant tables
+- Prevent double-booking the same table
+- Capture special requests
+
+## v0.3.0 — Staff Booking Dashboard
 
 Status: Planned
 
-- Add a guided booking assistant flow
-- Ask for date, time, guest count, name, email or phone, and special requests
-- Show a polished confirmation summary before submission
-- Keep the current visual style calm and premium
+- Add a private staff page
+- Show today’s reservations
+- Show special requests clearly
+- Allow staff to edit, cancel, or complete reservations
+- Add manual reservation creation
 
-## v0.3.0 — Lead Capture
-
-Status: Planned
-
-- Store reservation requests
-- Send booking details to the restaurant team
-- Add basic admin/review workflow if needed
-
-## v0.4.0 — AI Concierge Layer
+## v0.4.0 — Notifications
 
 Status: Planned
 
-- Add natural language booking help
-- Suggest suitable dining times or table notes
-- Handle special occasions and dietary notes
-- Prepare the system for real restaurant operations
+- Email restaurant team when a booking is created
+- Send guest confirmation email
+- Optional SMS/WhatsApp notification
+- Reminder flow before the reservation
+
+## v0.5.0 — Restaurant Knowledge Upgrade
+
+Status: Planned
+
+- Add detailed menu information
+- Add allergy and dietary policy
+- Add wine/champagne suggestions
+- Add final address, hours, and house rules
 
 ## Later
 
 - Custom domain
 - Analytics
-- Production booking integrations
-- Final restaurant content, photography, and menu details
+- Voice assistant
+- Payment or deposit flow
+- Production booking integration
