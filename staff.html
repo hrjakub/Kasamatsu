@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Kasamatsu Staff Schedule</title>
+    <link rel="stylesheet" href="staff.css" />
+  </head>
+  <body>
+    <header class="staff-header">
+      <div>
+        <p class="staff-kicker">Kasamatsu Operations</p>
+        <h1>Table Schedule</h1>
+      </div>
+      <a href="index.html">Guest website</a>
+    </header>
+
+    <main class="staff-main">
+      <section class="login-panel" data-login-panel>
+        <p class="staff-kicker">Staff access</p>
+        <h2>Open today’s floor plan</h2>
+        <form data-login-form>
+          <label for="staff-password">Staff password</label>
+          <div class="login-row">
+            <input
+              id="staff-password"
+              name="password"
+              type="password"
+              autocomplete="current-password"
+              required
+            />
+            <button type="submit">Open schedule</button>
+          </div>
+          <p class="status-message" data-login-status aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="dashboard" data-dashboard hidden>
+        <div class="dashboard-toolbar">
+          <div>
+            <p class="staff-kicker">Live Supabase schedule</p>
+            <h2 data-schedule-title>Floor plan</h2>
+          </div>
+          <div class="toolbar-actions">
+            <label for="schedule-date">Date</label>
+            <input id="schedule-date" type="date" data-schedule-date />
+            <button type="button" data-refresh>Refresh</button>
+            <button class="secondary" type="button" data-logout>Lock</button>
+          </div>
+        </div>
+
+        <div class="metrics" aria-label="Schedule summary">
+          <div>
+            <span>Reservations</span>
+            <strong data-reservation-count>0</strong>
+          </div>
+          <div>
+            <span>Guests</span>
+            <strong data-guest-count>0</strong>
+          </div>
+          <div>
+            <span>Booked tables</span>
+            <strong data-booked-count>0</strong>
+          </div>
+        </div>
+
+        <section class="floor-section" aria-labelledby="floor-title">
+          <div class="section-title-row">
+            <div>
+              <p class="staff-kicker">Floor plan</p>
+              <h3 id="floor-title">Ten-table overview</h3>
+            </div>
+            <p class="schedule-status" data-dashboard-status aria-live="polite"></p>
+          </div>
+          <div class="floor-plan" data-floor-plan></div>
+        </section>
+
+        <section class="booking-section" aria-labelledby="booking-title">
+          <p class="staff-kicker">Guest details</p>
+          <h3 id="booking-title">Reservation list</h3>
+          <div class="reservation-list" data-reservation-list></div>
+        </section>
+      </section>
+    </main>
+
+    <script src="staff.js"></script>
+  </body>
+</html>

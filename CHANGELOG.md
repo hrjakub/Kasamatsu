@@ -1,5 +1,45 @@
 # Changelog
 
+## v0.3.0 — 2026-06-06
+
+Menu intelligence, guest privacy, confirmation codes, and staff dashboard.
+
+### Added
+
+- Full guest-facing Japanese dinner menu with prices, dietary markers, and allergens
+- Database-backed menu search for AI menu and allergy questions
+- Reservation confirmation codes returned only after a successful database booking
+- Password-protected staff schedule at `/staff.html`
+- Live ten-table floor plan and daily reservation list for staff
+
+### Changed
+
+- Guest assistant responses are shorter and ask only one follow-up question
+- Guest assistant can check live availability but cannot reveal other guests' booking data
+- Guest-facing technical error messages no longer mention OpenAI, Supabase, keys, or environment variables
+- Public database functions are restricted to the server-side service role
+- Database schema can be safely rerun when the existing overlap-protection constraint is already present
+- Empty allergen lists now use an explicit PostgreSQL text-array type
+
+## v0.2.3 — 2026-06-06
+
+Booking assistant conversation polish.
+
+### Changed
+
+- Added restaurant timezone calendar context to the assistant prompt.
+- Improved weekday handling so phrases like "Tuesday at 8pm" are resolved instead of asking for the exact date again.
+- Changed the booking flow so the assistant checks availability before asking for guest name and email.
+
+## v0.2.2 — 2026-06-06
+
+Supabase permission fix for live booking availability checks.
+
+### Changed
+
+- Updated the availability lookup function to run with the safe server-side database permissions it needs.
+- Added explicit execute grants for the reservation helper functions used by the Vercel API route.
+
 ## v0.2.1 — 2026-06-06
 
 GitHub upload structure helper version.

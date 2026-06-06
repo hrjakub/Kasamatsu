@@ -4,9 +4,9 @@ Private testing website for Instant Lead, featuring the Kasamatsu Japanese resta
 
 ## Current Version
 
-**v0.2.1 — Corrected GitHub upload structure**
+**v0.3.0 — Menu intelligence and staff schedule**
 
-This version keeps the first real AI booking assistant infrastructure and packages the files so GitHub and Vercel can read the folders correctly:
+This version connects the guest website, AI assistant, Supabase reservation database, and a separate staff schedule:
 
 - Static Kasamatsu landing page
 - Reservation form connected to the assistant flow
@@ -15,6 +15,12 @@ This version keeps the first real AI booking assistant infrastructure and packag
 - OpenAI Responses API integration through a secure serverless function
 - Supabase database schema for 10 restaurant tables and reservations
 - Double-booking protection for overlapping reservations
+- Better weekday handling for phrases like "Tuesday at 8pm"
+- Availability is checked before asking for name and email
+- Full menu with prices, dietary markers, and allergens
+- Privacy rules preventing disclosure of other guests' booking data
+- Reservation confirmation codes
+- Password-protected staff floor plan and schedule at `/staff.html`
 - Placeholder environment variable file for setup
 - Correct root folders for GitHub: `api/`, `assets/`, and `database/`
 
@@ -26,7 +32,7 @@ No React, Next.js, npm install, or build step is required.
 index.html
 ```
 
-Contains the restaurant landing page, concept, menu preview, location block, reservation form, and booking assistant section.
+Contains the restaurant landing page, concept, full menu, location block, reservation form, and booking assistant section.
 
 ```text
 style.css
@@ -50,7 +56,19 @@ Runs only on Vercel. It keeps the OpenAI API key and Supabase service key privat
 database/supabase-schema.sql
 ```
 
-Creates the Supabase tables, seeds 10 restaurant tables, and adds functions for checking availability and creating reservations.
+Creates the Supabase tables, seeds 10 restaurant tables and the menu, and adds functions for checking availability, creating reservations, searching the menu, and loading the protected staff schedule.
+
+```text
+staff.html, staff.css, staff.js
+```
+
+Runs the separate staff schedule interface. Staff data is loaded only after the correct Vercel staff password is supplied.
+
+```text
+api/staff.js
+```
+
+Checks the private staff password on Vercel and loads the live Supabase schedule.
 
 ```text
 .env.example
@@ -70,12 +88,17 @@ Upload these files and folders to the root of the GitHub repository:
 - `index.html`
 - `style.css`
 - `script.js`
+- `staff.html`
+- `staff.css`
+- `staff.js`
 - `.env.example`
 - `.gitignore`
 - `README.md`
 - `CHANGELOG.md`
 - `ROADMAP.md`
 - `STATUS.md`
+- `SETUP_v0.3.0.md`
+- `UPLOAD_THIS.md`
 - `VERSION`
 
 Do not upload:
@@ -116,8 +139,11 @@ This creates:
 - 10 restaurant tables
 - A reservations table
 - A restaurant FAQ table
+- A menu with prices, ingredients, allergens, and dietary labels
 - Availability checking
 - Reservation creation
+- Confirmation codes
+- A protected staff schedule function
 - Double-booking protection
 
 ### 3. Get Supabase Keys
@@ -157,6 +183,7 @@ OPENAI_MODEL
 SUPABASE_URL
 SUPABASE_SERVICE_ROLE_KEY
 RESTAURANT_TIMEZONE
+STAFF_DASHBOARD_PASSWORD
 ```
 
 Suggested values:
@@ -165,6 +192,8 @@ Suggested values:
 OPENAI_MODEL=gpt-4.1-mini
 RESTAURANT_TIMEZONE=Europe/Paris
 ```
+
+Set `STAFF_DASHBOARD_PASSWORD` to a long password that is not used anywhere else. Keep it private and enable it only for Production and Preview.
 
 ### 6. Redeploy On Vercel
 
@@ -183,21 +212,30 @@ Try:
 - “Book a table for two tomorrow at 20:00.”
 - “Can I request the most romantic table with champagne?”
 - “Book four people Friday at 19:30 under Jakub, jakub@example.com.”
+- “Which dishes are vegan and gluten-free?”
+- “Does the miso black cod contain gluten?”
 - Try booking the same table/time twice to confirm the database prevents overlap.
+
+After a successful booking, confirm that the guest receives a confirmation code and open:
+
+```text
+https://kasamatsu.vercel.app/staff.html
+```
+
+Enter the staff password and verify the reservation appears on the selected date and table.
 
 ## Current Limitations
 
-- No staff dashboard yet.
 - No email or SMS confirmations yet.
 - No payment/deposit flow yet.
 - Opening hours and location are prototype values.
-- The assistant creates reservations in Supabase, but restaurant staff still need a future dashboard to review them comfortably.
+- The staff dashboard uses a shared password for this prototype. A production version should use individual staff accounts.
+- The prototype staff password endpoint does not yet include persistent rate limiting.
 
 ## Next Build Direction
 
 Next practical version:
 
-- Staff dashboard for today’s bookings
 - Manual reservation editing
 - Cancel/change reservation flow
 - Email notification to the restaurant team

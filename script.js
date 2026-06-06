@@ -6,9 +6,12 @@ const chatInput = document.querySelector("#assistant-input");
 const chatMessages = document.querySelector("[data-chat-messages]");
 const chatConnection = document.querySelector("[data-chat-connection]");
 const chatLauncher = document.querySelector("[data-chat-launcher]");
+const chatReset = document.querySelector("[data-chat-reset]");
 const promptButtons = [...document.querySelectorAll("[data-chat-prompt]")];
 
 const chatHistory = [];
+const initialChatMessage =
+  "Good evening. I can help with live table availability, menu and allergy questions, or a reservation. What would you like?";
 
 if (logo) {
   const canAnimate =
@@ -78,7 +81,9 @@ if (logo) {
   }
 }
 
-const today = new Date().toISOString().split("T")[0];
+const today = new Date().toLocaleDateString("en-CA", {
+  timeZone: "Europe/Paris",
+});
 const dateInput = document.querySelector("#date");
 
 if (dateInput) {
@@ -163,7 +168,7 @@ const sendChatMessage = async (content) => {
       "system",
       window.location.protocol === "file:"
         ? "The real assistant works after the site is deployed on Vercel, because it needs the /api/chat backend."
-        : "The assistant is not connected yet. Please check the OpenAI and Supabase environment variables in Vercel."
+        : "I’m sorry, I could not complete that request just now. Please try again."
     );
   } finally {
     setChatBusy(false);
@@ -188,6 +193,15 @@ promptButtons.forEach((button) => {
 
 if (chatLauncher) {
   chatLauncher.addEventListener("click", openAssistant);
+}
+
+if (chatReset) {
+  chatReset.addEventListener("click", () => {
+    chatHistory.length = 0;
+    chatMessages?.replaceChildren();
+    addChatMessage("bot", initialChatMessage);
+    chatInput?.focus();
+  });
 }
 
 if (form && formStatus) {

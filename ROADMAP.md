@@ -21,17 +21,28 @@ Status: Complete locally, ready for GitHub/Vercel/Supabase setup
 - Prevent double-booking the same table
 - Capture special requests
 
-## v0.3.0 — Staff Booking Dashboard
+## v0.3.0 — Menu Intelligence And Staff Schedule
+
+Status: Complete locally, ready for Supabase/GitHub/Vercel update
+
+- Add a password-protected staff page
+- Show the live daily table schedule and reservation details
+- Show special requests clearly
+- Add reservation confirmation codes
+- Add a full database-backed menu with prices and allergens
+- Prevent the guest assistant from exposing other guests' booking data
+- Keep guest assistant replies concise and warm
+
+## v0.4.0 — Staff Booking Management
 
 Status: Planned
 
-- Add a private staff page
-- Show today’s reservations
-- Show special requests clearly
+- Add individual staff accounts and persistent login protection
+- Add persistent login rate limiting
 - Allow staff to edit, cancel, or complete reservations
 - Add manual reservation creation
 
-## v0.4.0 — Notifications
+## v0.5.0 — Notifications
 
 Status: Planned
 
@@ -40,7 +51,7 @@ Status: Planned
 - Optional SMS/WhatsApp notification
 - Reminder flow before the reservation
 
-## v0.5.0 — Restaurant Knowledge Upgrade
+## v0.6.0 — Restaurant Knowledge Upgrade
 
 Status: Planned
 
