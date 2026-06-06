@@ -1,5 +1,18 @@
 # Changelog
 
+## v0.2.1 — 2026-06-06
+
+GitHub upload structure helper version.
+
+### Added
+
+- Clean upload package with `api/`, `assets/`, and `database/` kept as root folders
+- Upload instructions for avoiding flattened files on GitHub
+
+### Changed
+
+- Version marker updated so the corrected upload structure can be identified in GitHub and Vercel
+
 ## v0.2.0 — 2026-06-04
 
 First practical AI booking assistant version.

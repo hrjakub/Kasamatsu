@@ -4,9 +4,9 @@ Private testing website for Instant Lead, featuring the Kasamatsu Japanese resta
 
 ## Current Version
 
-**v0.2.0 — First practical AI booking assistant**
+**v0.2.1 — Corrected GitHub upload structure**
 
-This version adds the first real infrastructure for an AI restaurant reservation assistant:
+This version keeps the first real AI booking assistant infrastructure and packages the files so GitHub and Vercel can read the folders correctly:
 
 - Static Kasamatsu landing page
 - Reservation form connected to the assistant flow
@@ -16,6 +16,7 @@ This version adds the first real infrastructure for an AI restaurant reservation
 - Supabase database schema for 10 restaurant tables and reservations
 - Double-booking protection for overlapping reservations
 - Placeholder environment variable file for setup
+- Correct root folders for GitHub: `api/`, `assets/`, and `database/`
 
 No React, Next.js, npm install, or build step is required.
 
@@ -63,11 +64,12 @@ Shows which environment variables are needed. Do not put real keys in GitHub.
 
 Upload these files and folders to the root of the GitHub repository:
 
+- `api/`
+- `assets/`
+- `database/`
 - `index.html`
 - `style.css`
 - `script.js`
-- `api/chat.js`
-- `database/supabase-schema.sql`
 - `.env.example`
 - `.gitignore`
 - `README.md`
@@ -75,7 +77,6 @@ Upload these files and folders to the root of the GitHub repository:
 - `ROADMAP.md`
 - `STATUS.md`
 - `VERSION`
-- `assets/logo.png`
 
 Do not upload:
 
@@ -83,6 +84,24 @@ Do not upload:
 - `.env`
 - `.env.local`
 - Any file containing real secret keys
+
+Your GitHub repository root must show the folders directly like this:
+
+```text
+api/chat.js
+assets/logo.png
+database/supabase-schema.sql
+index.html
+style.css
+script.js
+```
+
+Do not upload the project as an extra nested folder like this:
+
+```text
+Kasamatsu/api/chat.js
+Kasamatsu/index.html
+```
 
 ### 2. Create A Supabase Project
 
