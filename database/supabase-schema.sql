@@ -257,7 +257,7 @@ as $$
       from public.reservations r
       where
         r.table_id = t.id
-        and r.status in ('confirmed', 'requested')
+        and r.status in ('confirmed', 'requested', 'seated')
         and tsrange(r.reservation_start, r.reservation_end, '[)') &&
           tsrange(
             p_date::timestamp + p_time,
@@ -268,7 +268,11 @@ as $$
   order by
     case
       when p_preferred_zone is not null
-        and lower(t.zone) like '%' || lower(p_preferred_zone) || '%'
+        and (
+          lower(t.zone) like '%' || lower(p_preferred_zone) || '%'
+          or lower(t.table_code) = lower(trim(p_preferred_zone))
+          or lower(t.description) like '%' || lower(p_preferred_zone) || '%'
+        )
       then 0
       else 1
     end,
@@ -445,3 +449,463 @@ grant execute on function public.find_available_tables(date, time, integer, text
 grant execute on function public.create_reservation_if_available(date, time, integer, text, text, text, text, text) to service_role;
 grant execute on function public.search_menu_items(text, text, text) to service_role;
 grant execute on function public.get_staff_schedule(date) to service_role;
+
+-- v0.4.0 staff operations, live floor, calendar, and waiting list
+
+alter table public.reservations
+  add column if not exists checked_in_at timestamptz;
+
+alter table public.reservations
+  drop constraint if exists reservations_status_check;
+
+alter table public.reservations
+  add constraint reservations_status_check
+  check (status in ('confirmed', 'requested', 'seated', 'cancelled', 'completed', 'no_show'));
+
+alter table public.reservations
+  drop constraint if exists reservations_no_table_overlap;
+
+alter table public.reservations
+  add constraint reservations_no_table_overlap
+  exclude using gist (
+    table_id with =,
+    tsrange(reservation_start, reservation_end, '[)') with &&
+  )
+  where (status in ('confirmed', 'requested', 'seated'));
+
+create table if not exists public.waitlist_entries (
+  id uuid primary key default gen_random_uuid(),
+  reservation_id uuid references public.reservations(id),
+  requested_date date not null,
+  requested_time time not null,
+  duration_minutes integer not null default 120 check (duration_minutes between 30 and 240),
+  guests integer not null check (guests between 1 and 12),
+  guest_name text not null,
+  email text not null,
+  phone text,
+  requested_preference text not null,
+  notes text,
+  status text not null default 'waiting'
+    check (status in ('waiting', 'notified', 'promoted', 'cancelled', 'expired')),
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create index if not exists waitlist_date_status_idx
+  on public.waitlist_entries (requested_date, status, created_at);
+
+create or replace function public.create_waitlist_request(
+  p_date date,
+  p_time time,
+  p_guests integer,
+  p_guest_name text,
+  p_email text,
+  p_phone text default null,
+  p_requested_preference text default null,
+  p_notes text default null,
+  p_reservation_confirmation_code text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  linked_reservation_id uuid;
+  new_waitlist_id uuid;
+  queue_position integer;
+begin
+  if p_guests < 1 or p_guests > 12 then
+    return jsonb_build_object('success', false, 'reason', 'The waiting list supports 1 to 12 guests.');
+  end if;
+
+  if coalesce(trim(p_guest_name), '') = '' or coalesce(trim(p_email), '') = '' then
+    return jsonb_build_object('success', false, 'reason', 'Guest name and email are required for the waiting list.');
+  end if;
+
+  if coalesce(trim(p_requested_preference), '') = '' then
+    return jsonb_build_object('success', false, 'reason', 'A requested table or area is required for the waiting list.');
+  end if;
+
+  if exists (
+    select 1
+    from public.waitlist_entries w
+    where w.requested_date = p_date
+      and w.requested_time = p_time
+      and lower(trim(w.email)) = lower(trim(p_email))
+      and lower(trim(w.requested_preference)) = lower(trim(p_requested_preference))
+      and w.status in ('waiting', 'notified')
+  ) then
+    return jsonb_build_object('success', false, 'reason', 'This guest is already on the waiting list for that request.');
+  end if;
+
+  if coalesce(trim(p_reservation_confirmation_code), '') <> '' then
+    select r.id
+    into linked_reservation_id
+    from public.reservations r
+    where upper(r.confirmation_code) = upper(trim(p_reservation_confirmation_code))
+      and r.status in ('confirmed', 'requested')
+    limit 1;
+  end if;
+
+  insert into public.waitlist_entries (
+    reservation_id,
+    requested_date,
+    requested_time,
+    guests,
+    guest_name,
+    email,
+    phone,
+    requested_preference,
+    notes
+  )
+  values (
+    linked_reservation_id,
+    p_date,
+    p_time,
+    p_guests,
+    trim(p_guest_name),
+    trim(p_email),
+    nullif(trim(p_phone), ''),
+    trim(p_requested_preference),
+    nullif(trim(p_notes), '')
+  )
+  returning id into new_waitlist_id;
+
+  select count(*)::integer
+  into queue_position
+  from public.waitlist_entries w
+  where w.requested_date = p_date
+    and w.requested_time = p_time
+    and lower(trim(w.requested_preference)) = lower(trim(p_requested_preference))
+    and w.status in ('waiting', 'notified')
+    and w.created_at <= (
+      select created_at from public.waitlist_entries where id = new_waitlist_id
+    );
+
+  return jsonb_build_object(
+    'success', true,
+    'waitlist_id', new_waitlist_id,
+    'queue_position', queue_position,
+    'requested_preference', trim(p_requested_preference),
+    'date', p_date,
+    'time', p_time,
+    'guests', p_guests,
+    'linked_to_reservation', linked_reservation_id is not null
+  );
+end;
+$$;
+
+create or replace function public.update_reservation_status(
+  p_reservation_id uuid,
+  p_status text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if p_status not in ('confirmed', 'requested', 'seated', 'cancelled', 'completed', 'no_show') then
+    return jsonb_build_object('success', false, 'reason', 'Unsupported reservation status.');
+  end if;
+
+  update public.reservations
+  set
+    status = p_status,
+    checked_in_at = case
+      when p_status = 'seated' then coalesce(checked_in_at, now())
+      when p_status in ('confirmed', 'requested') then null
+      else checked_in_at
+    end,
+    updated_at = now()
+  where id = p_reservation_id;
+
+  if not found then
+    return jsonb_build_object('success', false, 'reason', 'Reservation not found.');
+  end if;
+
+  return jsonb_build_object('success', true, 'reservation_id', p_reservation_id, 'status', p_status);
+end;
+$$;
+
+create or replace function public.update_waitlist_status(
+  p_waitlist_id uuid,
+  p_status text
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+begin
+  if p_status not in ('waiting', 'notified', 'promoted', 'cancelled', 'expired') then
+    return jsonb_build_object('success', false, 'reason', 'Unsupported waiting-list status.');
+  end if;
+
+  update public.waitlist_entries
+  set status = p_status, updated_at = now()
+  where id = p_waitlist_id;
+
+  if not found then
+    return jsonb_build_object('success', false, 'reason', 'Waiting-list entry not found.');
+  end if;
+
+  return jsonb_build_object('success', true, 'waitlist_id', p_waitlist_id, 'status', p_status);
+end;
+$$;
+
+create or replace function public.promote_waitlist_entry(
+  p_waitlist_id uuid,
+  p_table_id uuid
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  wait_entry record;
+  selected_table record;
+  promoted_reservation_id uuid;
+  promoted_confirmation_code text;
+begin
+  select * into wait_entry
+  from public.waitlist_entries
+  where id = p_waitlist_id
+    and status in ('waiting', 'notified')
+  for update;
+
+  if wait_entry.id is null then
+    return jsonb_build_object('success', false, 'reason', 'This waiting-list entry is no longer active.');
+  end if;
+
+  select * into selected_table
+  from public.restaurant_tables
+  where id = p_table_id
+    and is_active = true;
+
+  if selected_table.id is null or selected_table.seats < wait_entry.guests then
+    return jsonb_build_object('success', false, 'reason', 'That table cannot seat this party.');
+  end if;
+
+  perform pg_advisory_xact_lock(hashtext(wait_entry.requested_date::text || ':' || wait_entry.requested_time::text));
+
+  if exists (
+    select 1
+    from public.waitlist_entries earlier
+    where earlier.requested_date = wait_entry.requested_date
+      and earlier.requested_time = wait_entry.requested_time
+      and lower(trim(earlier.requested_preference)) = lower(trim(wait_entry.requested_preference))
+      and earlier.status in ('waiting', 'notified')
+      and earlier.created_at < wait_entry.created_at
+  ) then
+    return jsonb_build_object('success', false, 'reason', 'An earlier guest is first in line for that requested table or area.');
+  end if;
+
+  if wait_entry.reservation_id is not null then
+    update public.reservations
+    set table_id = p_table_id, status = 'confirmed', updated_at = now()
+    where id = wait_entry.reservation_id
+      and status in ('confirmed', 'requested')
+    returning id, confirmation_code into promoted_reservation_id, promoted_confirmation_code;
+  else
+    insert into public.reservations (
+      table_id,
+      reservation_date,
+      reservation_time,
+      duration_minutes,
+      guests,
+      guest_name,
+      email,
+      phone,
+      special_requests,
+      status
+    )
+    values (
+      p_table_id,
+      wait_entry.requested_date,
+      wait_entry.requested_time,
+      wait_entry.duration_minutes,
+      wait_entry.guests,
+      wait_entry.guest_name,
+      wait_entry.email,
+      wait_entry.phone,
+      concat_ws(' · ', wait_entry.notes, 'Promoted from waiting list: ' || wait_entry.requested_preference),
+      'confirmed'
+    )
+    returning id, confirmation_code into promoted_reservation_id, promoted_confirmation_code;
+  end if;
+
+  if promoted_reservation_id is null then
+    return jsonb_build_object('success', false, 'reason', 'The linked reservation could not be reassigned.');
+  end if;
+
+  update public.waitlist_entries
+  set status = 'promoted', reservation_id = promoted_reservation_id, updated_at = now()
+  where id = p_waitlist_id;
+
+  return jsonb_build_object(
+    'success', true,
+    'reservation_id', promoted_reservation_id,
+    'confirmation_code', promoted_confirmation_code,
+    'table_code', selected_table.table_code,
+    'waitlist_id', p_waitlist_id
+  );
+exception
+  when exclusion_violation then
+    return jsonb_build_object('success', false, 'reason', 'That table is not free for the requested time.');
+end;
+$$;
+
+create or replace function public.get_staff_schedule(p_date date)
+returns jsonb
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select jsonb_build_object(
+    'date', p_date,
+    'tables',
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', t.id,
+              'table_code', t.table_code,
+              'seats', t.seats,
+              'zone', t.zone,
+              'description', t.description,
+              'request_score', t.request_score,
+              'is_active', t.is_active
+            )
+            order by t.table_code
+          )
+          from public.restaurant_tables t
+        ),
+        '[]'::jsonb
+      ),
+    'reservations',
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', r.id,
+              'confirmation_code', r.confirmation_code,
+              'table_id', r.table_id,
+              'table_code', t.table_code,
+              'zone', t.zone,
+              'reservation_date', r.reservation_date,
+              'reservation_time', r.reservation_time,
+              'duration_minutes', r.duration_minutes,
+              'reservation_start', r.reservation_start,
+              'reservation_end', r.reservation_end,
+              'checked_in_at', r.checked_in_at,
+              'guests', r.guests,
+              'guest_name', r.guest_name,
+              'email', r.email,
+              'phone', r.phone,
+              'special_requests', r.special_requests,
+              'status', r.status
+            )
+            order by r.reservation_time, t.table_code
+          )
+          from public.reservations r
+          join public.restaurant_tables t on t.id = r.table_id
+          where r.reservation_date = p_date
+            and r.status in ('confirmed', 'requested', 'seated', 'completed', 'no_show')
+        ),
+        '[]'::jsonb
+      ),
+    'waitlist',
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', w.id,
+              'reservation_id', w.reservation_id,
+              'requested_date', w.requested_date,
+              'requested_time', w.requested_time,
+              'duration_minutes', w.duration_minutes,
+              'guests', w.guests,
+              'guest_name', w.guest_name,
+              'email', w.email,
+              'phone', w.phone,
+              'requested_preference', w.requested_preference,
+              'notes', w.notes,
+              'status', w.status,
+              'created_at', w.created_at
+            )
+            order by w.created_at
+          )
+          from public.waitlist_entries w
+          where w.requested_date = p_date
+            and w.status in ('waiting', 'notified')
+        ),
+        '[]'::jsonb
+      )
+  );
+$$;
+
+create or replace function public.get_staff_calendar(
+  p_start_date date,
+  p_end_date date
+)
+returns table (
+  reservation_date date,
+  reservation_count bigint,
+  guest_count bigint,
+  booked_table_count bigint,
+  waiting_count bigint,
+  table_bookings jsonb
+)
+language sql
+stable
+security definer
+set search_path = public
+as $$
+  select
+    days.day::date as reservation_date,
+    count(distinct r.id) filter (where r.status in ('confirmed', 'requested', 'seated')) as reservation_count,
+    coalesce(sum(r.guests) filter (where r.status in ('confirmed', 'requested', 'seated')), 0)::bigint as guest_count,
+    count(distinct r.table_id) filter (where r.status in ('confirmed', 'requested', 'seated')) as booked_table_count,
+    (
+      select count(*)
+      from public.waitlist_entries w
+      where w.requested_date = days.day::date
+        and w.status in ('waiting', 'notified')
+    ) as waiting_count,
+    coalesce(
+      jsonb_agg(
+        jsonb_build_object(
+          'table_code', t.table_code,
+          'time', r.reservation_time,
+          'guests', r.guests,
+          'status', r.status
+        )
+        order by r.reservation_time, t.table_code
+      ) filter (where r.id is not null and r.status in ('confirmed', 'requested', 'seated')),
+      '[]'::jsonb
+    ) as table_bookings
+  from generate_series(p_start_date, p_end_date, interval '1 day') as days(day)
+  left join public.reservations r on r.reservation_date = days.day::date
+  left join public.restaurant_tables t on t.id = r.table_id
+  group by days.day::date
+  order by days.day::date;
+$$;
+
+alter table public.waitlist_entries enable row level security;
+
+revoke all on table public.waitlist_entries from anon, authenticated;
+revoke all on function public.create_waitlist_request(date, time, integer, text, text, text, text, text, text) from public, anon, authenticated;
+revoke all on function public.update_reservation_status(uuid, text) from public, anon, authenticated;
+revoke all on function public.update_waitlist_status(uuid, text) from public, anon, authenticated;
+revoke all on function public.promote_waitlist_entry(uuid, uuid) from public, anon, authenticated;
+revoke all on function public.get_staff_calendar(date, date) from public, anon, authenticated;
+
+grant execute on function public.create_waitlist_request(date, time, integer, text, text, text, text, text, text) to service_role;
+grant execute on function public.update_reservation_status(uuid, text) to service_role;
+grant execute on function public.update_waitlist_status(uuid, text) to service_role;
+grant execute on function public.promote_waitlist_entry(uuid, uuid) to service_role;
+grant execute on function public.get_staff_calendar(date, date) to service_role;

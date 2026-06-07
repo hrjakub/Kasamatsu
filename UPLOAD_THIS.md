@@ -4,10 +4,10 @@ This folder is the corrected Kasamatsu upload package.
 
 ## What To Do
 
-Open this folder:
+Open the latest v0.4.0 upload folder:
 
 ```text
-Kasamatsu-v0.3.0-upload
+Kasamatsu-v0.4.0-upload
 ```
 
 Select everything inside it and upload those items to the root of your GitHub repository.
@@ -28,7 +28,7 @@ README.md
 CHANGELOG.md
 ROADMAP.md
 STATUS.md
-SETUP_v0.3.0.md
+SETUP_v0.4.0.md
 VERSION
 UPLOAD_THIS.md
 .env.example
@@ -52,7 +52,7 @@ staff.js
 Do not upload the whole folder as one nested folder:
 
 ```text
-Kasamatsu-v0.3.0-upload/api/chat.js
+Kasamatsu-v0.4.0-upload/api/chat.js
 ```
 
 Vercel needs:

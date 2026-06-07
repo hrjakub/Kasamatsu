@@ -33,16 +33,17 @@ Status: Complete locally, ready for Supabase/GitHub/Vercel update
 - Prevent the guest assistant from exposing other guests' booking data
 - Keep guest assistant replies concise and warm
 
-## v0.4.0 — Staff Booking Management
+## v0.4.0 — Staff Operations And Waiting List
 
-Status: Planned
+Status: Complete locally, ready for Supabase/GitHub/Vercel update
 
-- Add individual staff accounts and persistent login protection
-- Add persistent login rate limiting
-- Allow staff to edit, cancel, or complete reservations
-- Add manual reservation creation
+- Add Day, Calendar, Live floor, and Waiting list modes
+- Show free two-hour starts by table
+- Show monthly bookings by table
+- Track check-in, elapsed time, completion, and no-shows
+- Add preferred-table waiting list and staff assignment
 
-## v0.5.0 — Notifications
+## v0.5.0 — Notifications And Staff Authentication
 
 Status: Planned
 
@@ -50,6 +51,9 @@ Status: Planned
 - Send guest confirmation email
 - Optional SMS/WhatsApp notification
 - Reminder flow before the reservation
+- Add individual staff accounts and persistent login protection
+- Add persistent login rate limiting
+- Allow staff to edit and manually create reservations
 
 ## v0.6.0 — Restaurant Knowledge Upgrade
 

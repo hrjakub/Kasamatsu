@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.4.0 — 2026-06-07
+
+Staff operations dashboard and preferred-table waiting list.
+
+### Added
+
+- Day mode with reservations and every available two-hour start for each table
+- Outlook-style monthly calendar showing bookings, guests, tables, and waiting-list totals
+- Live top-down restaurant view showing free, upcoming, seated, and overtime tables
+- Staff check-in, complete, and no-show actions
+- Database-backed preferred-table waiting list
+- Staff controls to notify, remove, or assign a genuinely free table to a waiting guest
+- First-in-line assignment enforcement for each requested table or area
+- Guest assistant waiting-list tool when a preferred table or area is unavailable
+
+### Changed
+
+- Availability results now distinguish requested preferences from alternative tables
+- A guest can hold an alternative reservation while waiting for their preferred table
+- Staff schedule API now supports calendar loading and protected operational actions
+
 ## v0.3.1 — 2026-06-07
 
 Availability-first booking flow.

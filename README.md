@@ -4,7 +4,7 @@ Private testing website for Instant Lead, featuring the Kasamatsu Japanese resta
 
 ## Current Version
 
-**v0.3.1 — Availability-first booking flow**
+**v0.4.0 — Staff operations and preferred-table waiting list**
 
 This version connects the guest website, AI assistant, Supabase reservation database, and a separate staff schedule:
 
@@ -22,6 +22,11 @@ This version connects the guest website, AI assistant, Supabase reservation data
 - Privacy rules preventing disclosure of other guests' booking data
 - Reservation confirmation codes
 - Password-protected staff floor plan and schedule at `/staff.html`
+- Day mode with free two-hour booking starts for every table
+- Outlook-style monthly booking calendar
+- Live top-down restaurant view with check-in time, elapsed time, and reservation finish
+- Preferred-table waiting list with protected, first-in-line staff assignment
+- Staff actions for check-in, complete, and no-show
 - Placeholder environment variable file for setup
 - Correct root folders for GitHub: `api/`, `assets/`, and `database/`
 
@@ -57,13 +62,13 @@ Runs only on Vercel. It keeps the OpenAI API key and Supabase service key privat
 database/supabase-schema.sql
 ```
 
-Creates the Supabase tables, seeds 10 restaurant tables and the menu, and adds functions for checking availability, creating reservations, searching the menu, and loading the protected staff schedule.
+Creates the Supabase tables, seeds 10 restaurant tables and the menu, and adds functions for availability, reservations, menu search, the waiting list, the monthly calendar, and protected staff operations.
 
 ```text
 staff.html, staff.css, staff.js
 ```
 
-Runs the separate staff schedule interface. Staff data is loaded only after the correct Vercel staff password is supplied.
+Runs the separate staff operations interface. Staff data and actions are available only after the correct Vercel staff password is supplied. Waiting-list assignment preserves first-in-line priority for each requested table or area.
 
 ```text
 api/staff.js
@@ -98,7 +103,7 @@ Upload these files and folders to the root of the GitHub repository:
 - `CHANGELOG.md`
 - `ROADMAP.md`
 - `STATUS.md`
-- `SETUP_v0.3.0.md`
+- `SETUP_v0.4.0.md`
 - `UPLOAD_THIS.md`
 - `VERSION`
 
@@ -135,7 +140,7 @@ Kasamatsu/index.html
 4. Paste everything from `database/supabase-schema.sql`.
 5. Run the SQL.
 
-This creates:
+This creates or updates:
 
 - 10 restaurant tables
 - A reservations table
@@ -145,6 +150,9 @@ This creates:
 - Reservation creation
 - Confirmation codes
 - A protected staff schedule function
+- A preferred-table waiting list
+- A protected monthly staff calendar
+- Protected check-in, no-show, completion, and waiting-list assignment actions
 - Double-booking protection
 
 ### 3. Get Supabase Keys
@@ -216,6 +224,7 @@ Try:
 - “Which dishes are vegan and gluten-free?”
 - “Does the miso black cod contain gluten?”
 - Try booking the same table/time twice to confirm the database prevents overlap.
+- Ask for an unavailable preferred table and agree to join the waiting list.
 
 After a successful booking, confirm that the guest receives a confirmation code and open:
 
@@ -223,7 +232,7 @@ After a successful booking, confirm that the guest receives a confirmation code 
 https://kasamatsu.vercel.app/staff.html
 ```
 
-Enter the staff password and verify the reservation appears on the selected date and table.
+Enter the staff password and verify the reservation appears on the selected date and table. Test Day, Calendar, Live floor, and Waiting list modes.
 
 ## Current Limitations
 
@@ -237,7 +246,7 @@ Enter the staff password and verify the reservation appears on the selected date
 
 Next practical version:
 
-- Manual reservation editing
-- Cancel/change reservation flow
 - Email notification to the restaurant team
+- Individual staff accounts and persistent authentication
+- Manual reservation editing and creation
 - More detailed menu and policy knowledge

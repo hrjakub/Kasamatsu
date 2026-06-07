@@ -4,14 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <title>Kasamatsu Staff Schedule</title>
+    <title>Kasamatsu Staff Operations</title>
     <link rel="stylesheet" href="staff.css" />
   </head>
   <body>
     <header class="staff-header">
       <div>
         <p class="staff-kicker">Kasamatsu Operations</p>
-        <h1>Table Schedule</h1>
+        <h1>Dining Room Control</h1>
       </div>
       <a href="index.html">Guest website</a>
     </header>
@@ -19,7 +19,7 @@
     <main class="staff-main">
       <section class="login-panel" data-login-panel>
         <p class="staff-kicker">Staff access</p>
-        <h2>Open today’s floor plan</h2>
+        <h2>Open restaurant operations</h2>
         <form data-login-form>
           <label for="staff-password">Staff password</label>
           <div class="login-row">
@@ -30,7 +30,7 @@
               autocomplete="current-password"
               required
             />
-            <button type="submit">Open schedule</button>
+            <button type="submit">Open dashboard</button>
           </div>
           <p class="status-message" data-login-status aria-live="polite"></p>
         </form>
@@ -39,16 +39,25 @@
       <section class="dashboard" data-dashboard hidden>
         <div class="dashboard-toolbar">
           <div>
-            <p class="staff-kicker">Live Supabase schedule</p>
-            <h2 data-schedule-title>Floor plan</h2>
+            <p class="staff-kicker">Live Supabase operations</p>
+            <h2 data-schedule-title>Dining room</h2>
           </div>
           <div class="toolbar-actions">
-            <label for="schedule-date">Date</label>
+            <label for="schedule-date">Operating date</label>
             <input id="schedule-date" type="date" data-schedule-date />
             <button type="button" data-refresh>Refresh</button>
             <button class="secondary" type="button" data-logout>Lock</button>
           </div>
         </div>
+
+        <nav class="view-switcher" aria-label="Dashboard views">
+          <button type="button" class="is-active" data-view-button="day">Day</button>
+          <button type="button" data-view-button="calendar">Calendar</button>
+          <button type="button" data-view-button="live">Live floor</button>
+          <button type="button" data-view-button="waitlist">
+            Waiting list <span data-waiting-badge>0</span>
+          </button>
+        </nav>
 
         <div class="metrics" aria-label="Schedule summary">
           <div>
@@ -63,23 +72,78 @@
             <span>Booked tables</span>
             <strong data-booked-count>0</strong>
           </div>
+          <div>
+            <span>Free starts</span>
+            <strong data-free-count>0</strong>
+          </div>
         </div>
 
-        <section class="floor-section" aria-labelledby="floor-title">
+        <p class="schedule-status" data-dashboard-status aria-live="polite"></p>
+
+        <section class="dashboard-view is-active" data-view="day">
           <div class="section-title-row">
             <div>
-              <p class="staff-kicker">Floor plan</p>
-              <h3 id="floor-title">Ten-table overview</h3>
+              <p class="staff-kicker">Current mode</p>
+              <h3>Day schedule and free spots</h3>
             </div>
-            <p class="schedule-status" data-dashboard-status aria-live="polite"></p>
+            <p>Free starts use 30-minute intervals from 18:30 to 21:30.</p>
           </div>
-          <div class="floor-plan" data-floor-plan></div>
+          <div class="day-table-grid" data-day-table-grid></div>
+
+          <div class="booking-section">
+            <p class="staff-kicker">Guest details</p>
+            <h3>Reservation list</h3>
+            <div class="reservation-list" data-reservation-list></div>
+          </div>
         </section>
 
-        <section class="booking-section" aria-labelledby="booking-title">
-          <p class="staff-kicker">Guest details</p>
-          <h3 id="booking-title">Reservation list</h3>
-          <div class="reservation-list" data-reservation-list></div>
+        <section class="dashboard-view" data-view="calendar" hidden>
+          <div class="section-title-row">
+            <div>
+              <p class="staff-kicker">Calendar mode</p>
+              <h3 data-calendar-title>Monthly booking calendar</h3>
+            </div>
+            <div class="calendar-actions">
+              <button class="secondary" type="button" data-calendar-previous aria-label="Previous month">
+                Previous
+              </button>
+              <button class="secondary" type="button" data-calendar-next aria-label="Next month">
+                Next
+              </button>
+            </div>
+          </div>
+          <div class="calendar-weekdays" aria-hidden="true">
+            <span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span>
+            <span>Fri</span><span>Sat</span><span>Sun</span>
+          </div>
+          <div class="calendar-grid" data-calendar-grid></div>
+        </section>
+
+        <section class="dashboard-view" data-view="live" hidden>
+          <div class="section-title-row">
+            <div>
+              <p class="staff-kicker">Visual mode</p>
+              <h3>Live top-down restaurant view</h3>
+            </div>
+            <div class="live-legend">
+              <span><i class="legend-free"></i> Free</span>
+              <span><i class="legend-upcoming"></i> Upcoming</span>
+              <span><i class="legend-seated"></i> Seated</span>
+              <span><i class="legend-overtime"></i> Overtime</span>
+            </div>
+          </div>
+          <div class="restaurant-map" data-restaurant-map></div>
+        </section>
+
+        <section class="dashboard-view" data-view="waitlist" hidden>
+          <div class="section-title-row">
+            <div>
+              <p class="staff-kicker">Waiting list</p>
+              <h3>Preferred-table queue</h3>
+            </div>
+            <p>First requested entry appears first. Assign a table only when it is genuinely free.</p>
+          </div>
+          <div class="waitlist-list" data-waitlist-list></div>
         </section>
       </section>
     </main>
