@@ -10,7 +10,7 @@
 - Inline SVG umbrella pine logo
 - Animated pine needle clusters on desktop hover
 - Concept, full menu, location, reservation, assistant, and footer sections
-- Reservation form now hands details to the assistant
+- All reservation calls to action now lead directly to the assistant
 - Chat assistant UI is live on the page
 - `/api/chat` backend has been added for Vercel
 - Supabase setup SQL has been added

@@ -9,7 +9,7 @@ Private testing website for Instant Lead, featuring the Kasamatsu Japanese resta
 This version connects the guest website, AI assistant, Supabase reservation database, and a separate staff schedule:
 
 - Static Kasamatsu landing page
-- Reservation form connected to the assistant flow
+- All reservation calls to action lead directly to the assistant flow
 - AI-style booking assistant interface on the page
 - Vercel backend endpoint at `/api/chat`
 - OpenAI Responses API integration through a secure serverless function
@@ -38,19 +38,19 @@ No React, Next.js, npm install, or build step is required.
 index.html
 ```
 
-Contains the restaurant landing page, concept, full menu, location block, reservation form, and booking assistant section.
+Contains the restaurant landing page, concept, illustrated full menu, Ramatuelle location block, and booking assistant section.
 
 ```text
 style.css
 ```
 
-Controls the full visual design, responsive layout, reservation form, and assistant interface.
+Controls the full visual design, responsive layout, illustrated menu, location artwork, and assistant interface.
 
 ```text
 script.js
 ```
 
-Runs the logo animation, reservation form behavior, chat UI, quick prompts, and browser-to-backend calls.
+Runs the logo animation, chat UI, quick prompts, and browser-to-backend calls.
 
 ```text
 api/chat.js

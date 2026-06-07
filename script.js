@@ -1,6 +1,4 @@
 const logo = document.querySelector("[data-logo-breeze]");
-const form = document.querySelector("[data-reservation-form]");
-const formStatus = document.querySelector("[data-form-status]");
 const chatForm = document.querySelector("[data-chat-form]");
 const chatInput = document.querySelector("#assistant-input");
 const chatMessages = document.querySelector("[data-chat-messages]");
@@ -98,15 +96,6 @@ if (logo) {
       }
     });
   }
-}
-
-const today = new Date().toLocaleDateString("en-CA", {
-  timeZone: "Europe/Paris",
-});
-const dateInput = document.querySelector("#date");
-
-if (dateInput) {
-  dateInput.min = today;
 }
 
 const setChatBusy = (isBusy) => {
@@ -220,40 +209,5 @@ if (chatReset) {
     chatMessages?.replaceChildren();
     addChatMessage("bot", initialChatMessage);
     chatInput?.focus();
-  });
-}
-
-if (form && formStatus) {
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-
-    const formData = new FormData(form);
-    const details = {
-      name: formData.get("name"),
-      email: formData.get("email"),
-      phone: formData.get("phone"),
-      date: formData.get("date"),
-      time: formData.get("time"),
-      guests: formData.get("guests"),
-      message: formData.get("message"),
-    };
-
-    const prompt = [
-      "I would like to request a reservation.",
-      `Name: ${details.name || "Not provided"}.`,
-      `Email: ${details.email || "Not provided"}.`,
-      details.phone ? `Phone: ${details.phone}.` : "",
-      `Date: ${details.date || "Not provided"}.`,
-      `Time: ${details.time || "Not provided"}.`,
-      `Guests: ${details.guests || "Not provided"}.`,
-      details.message ? `Special request: ${details.message}.` : "",
-      "If there is availability, please create the reservation and tell me the table details.",
-    ]
-      .filter(Boolean)
-      .join(" ");
-
-    formStatus.textContent = "Opening the booking assistant with your request.";
-    openAssistant();
-    sendChatMessage(prompt);
   });
 }

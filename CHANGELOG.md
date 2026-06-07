@@ -7,6 +7,9 @@
 - Replaced the simplified hero tree with a detailed hand-drawn umbrella pine logo
 - Added subtle layered canopy movement that follows pointer movement across the page
 - Preserved a stable trunk and reduced-motion fallback for a calm, accessible effect
+- Placed two unlabeled hand-drawn dish illustrations inside the menu's natural empty spaces
+- Added a wide hand-drawn Ramatuelle village sketch to the location section
+- Removed the separate reservation request form so all reservation paths lead to the Kasamatsu Assistant
 
 ## v0.4.0 — 2026-06-07
 

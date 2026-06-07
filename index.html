@@ -20,7 +20,7 @@
         <a href="#concept">Concept</a>
         <a href="#menu">Menu</a>
         <a href="#assistant">Assistant</a>
-        <a href="#reservation">Reserve</a>
+        <a href="#assistant">Reserve</a>
       </nav>
     </header>
 
@@ -58,7 +58,7 @@
             booking experience near Saint-Tropez.
           </p>
           <div class="hero-actions" aria-label="Primary">
-            <a class="button primary" href="#reservation">Reserve a table</a>
+            <a class="button primary" href="#assistant">Reserve with assistant</a>
             <a class="button secondary" href="#menu">Discover the menu</a>
           </div>
         </div>
@@ -118,6 +118,13 @@
                   <strong>€12</strong>
                 </article>
               </div>
+              <figure class="menu-inline-art">
+                <img
+                  src="assets/food/yellowtail-jalapeno.png"
+                  alt="Hand-drawn Japanese cold plate"
+                  loading="lazy"
+                />
+              </figure>
             </section>
 
             <section class="menu-group" aria-labelledby="menu-cold">
@@ -154,6 +161,13 @@
                   <strong>€14</strong>
                 </article>
               </div>
+              <figure class="menu-inline-art menu-inline-art-small">
+                <img
+                  src="assets/food/miso-black-cod.png"
+                  alt="Hand-drawn Japanese black cod plate"
+                  loading="lazy"
+                />
+              </figure>
             </section>
 
             <section class="menu-group" aria-labelledby="menu-robata">
@@ -236,68 +250,13 @@
             table close to the sea. Full address and opening hours will be added
             before launch.
           </p>
-        </div>
-      </section>
-
-      <section
-        class="section reservation"
-        id="reservation"
-        aria-labelledby="reservation-title"
-      >
-        <div class="section-inner reservation-layout">
-          <div>
-            <p class="eyebrow">Reservation</p>
-            <h2 id="reservation-title">Request a table.</h2>
-            <p class="reservation-note">
-              The Instant Lead assistant can help guests choose a time, share
-              notes, and communicate special requests.
-            </p>
-          </div>
-
-          <form class="reservation-form" data-reservation-form>
-            <div class="field">
-              <label for="name">Name</label>
-              <input id="name" name="name" type="text" autocomplete="name" required />
-            </div>
-            <div class="field">
-              <label for="email">Email</label>
-              <input id="email" name="email" type="email" autocomplete="email" required />
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="date">Date</label>
-                <input id="date" name="date" type="date" required />
-              </div>
-              <div class="field">
-                <label for="time">Time</label>
-                <input id="time" name="time" type="time" required />
-              </div>
-            </div>
-            <div class="field-row">
-              <div class="field">
-                <label for="guests">Guests</label>
-                <input
-                  id="guests"
-                  name="guests"
-                  type="number"
-                  min="1"
-                  max="12"
-                  value="2"
-                  required
-                />
-              </div>
-              <div class="field">
-                <label for="phone">Phone</label>
-                <input id="phone" name="phone" type="tel" autocomplete="tel" />
-              </div>
-            </div>
-            <div class="field">
-              <label for="message">Message</label>
-              <textarea id="message" name="message" rows="4"></textarea>
-            </div>
-            <button class="button primary form-button" type="submit">Ask assistant</button>
-            <p class="form-status" data-form-status role="status" aria-live="polite"></p>
-          </form>
+          <figure class="location-art">
+            <img
+              src="assets/location/ramatuelle-village.jpg"
+              alt="Hand-drawn aerial view of Ramatuelle village"
+              loading="lazy"
+            />
+          </figure>
         </div>
       </section>
 
