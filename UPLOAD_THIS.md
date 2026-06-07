@@ -41,6 +41,8 @@ The important backend files must keep these paths:
 api/chat.js
 api/staff.js
 database/supabase-schema.sql
+database/fix-v0.4.0-calendar.sql
+database/verify-v0.4.0.sql
 assets/logo.png
 staff.html
 staff.css

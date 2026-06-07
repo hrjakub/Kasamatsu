@@ -21,6 +21,10 @@ Staff operations dashboard and preferred-table waiting list.
 - A guest can hold an alternative reservation while waiting for their preferred table
 - Staff schedule API now supports calendar loading and protected operational actions
 
+### Fixed
+
+- Staff calendar database query now aggregates reservation and waiting-list totals separately
+
 ## v0.3.1 — 2026-06-07
 
 Availability-first booking flow.

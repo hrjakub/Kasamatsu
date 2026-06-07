@@ -8,6 +8,14 @@
 4. Paste all contents of `database/supabase-schema.sql`.
 5. Click **Run**.
 
+If Supabase previously showed an error while running the v0.4.0 schema, run the
+complete corrected schema again. A failed schema run can roll back the
+waiting-list table and the other v0.4.0 database additions.
+
+After it succeeds, run `database/verify-v0.4.0.sql`. It should show the
+waiting-list table and protected functions as installed, followed by calendar
+rows for the next seven days.
+
 This keeps existing reservations and adds:
 
 - Waiting-list entries
