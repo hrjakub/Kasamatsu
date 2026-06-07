@@ -2,7 +2,7 @@
 
 ## Current Version
 
-**v0.3.0 — Menu intelligence and staff schedule**
+**v0.3.1 — Availability-first booking flow**
 
 ## Current Website State
 
@@ -15,7 +15,8 @@
 - `/api/chat` backend has been added for Vercel
 - Supabase setup SQL has been added
 - Assistant now handles normal weekday requests more naturally
-- Assistant checks availability before asking for name and email
+- Assistant checks availability immediately once date, time, and party size are known
+- Assistant cannot claim a preferred table or zone is available before a matching live database result
 - Full menu with prices, dietary markers, and allergen information
 - Privacy-aware assistant that cannot expose other guests' data
 - Confirmation codes for successful reservations

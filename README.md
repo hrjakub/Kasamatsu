@@ -4,7 +4,7 @@ Private testing website for Instant Lead, featuring the Kasamatsu Japanese resta
 
 ## Current Version
 
-**v0.3.0 — Menu intelligence and staff schedule**
+**v0.3.1 — Availability-first booking flow**
 
 This version connects the guest website, AI assistant, Supabase reservation database, and a separate staff schedule:
 
@@ -16,7 +16,8 @@ This version connects the guest website, AI assistant, Supabase reservation data
 - Supabase database schema for 10 restaurant tables and reservations
 - Double-booking protection for overlapping reservations
 - Better weekday handling for phrases like "Tuesday at 8pm"
-- Availability is checked before asking for name and email
+- Availability is checked immediately once date, time, and party size are known
+- Name and email are requested only after live availability is clearly confirmed
 - Full menu with prices, dietary markers, and allergens
 - Privacy rules preventing disclosure of other guests' booking data
 - Reservation confirmation codes

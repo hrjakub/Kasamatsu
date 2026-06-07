@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.3.1 — 2026-06-07
+
+Availability-first booking flow.
+
+### Changed
+
+- The assistant now asks only for the missing party size when a guest initially provides a date and time.
+- Live availability is checked immediately once date, time, and party size are known.
+- The assistant cannot claim that a time, table, terrace, or preferred zone is available before receiving a matching live availability result.
+- Guest names and email addresses are requested only after availability has been clearly confirmed.
+
 ## v0.3.0 — 2026-06-06
 
 Menu intelligence, guest privacy, confirmation codes, and staff dashboard.
