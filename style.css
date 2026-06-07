@@ -466,7 +466,8 @@ h3 {
 
 .location-art img {
   display: block;
-  width: 100%;
+  width: min(100%, 680px);
+  margin: 0 auto;
   opacity: 0.84;
   mix-blend-mode: multiply;
 }
