@@ -19,65 +19,84 @@ if (logo) {
     !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   if (canAnimate) {
-    const clusters = [...logo.querySelectorAll(".needle-cluster")];
+    const canopyLayers = [...logo.querySelectorAll(".tree-canopy")];
     const state = {
       targetX: 0,
       targetY: 0,
       currentX: 0,
       currentY: 0,
       frame: 0,
+      lastPointerMove: 0,
     };
 
-    const moveNeedles = (time) => {
-      state.currentX += (state.targetX - state.currentX) * 0.13;
-      state.currentY += (state.targetY - state.currentY) * 0.13;
+    const moveCanopy = (time) => {
+      const idleFor = time - state.lastPointerMove;
 
-      clusters.forEach((cluster) => {
-        const depth = Number(cluster.dataset.depth || 1);
-        const phase = Number(cluster.dataset.phase || 0);
-        const pulse = Math.sin(time * 0.0014 + phase * Math.PI) * 0.28;
-        const tx = state.currentX * 3.2 * depth + pulse;
-        const ty = state.currentY * 1.5 * depth - Math.abs(state.currentX) * 0.32;
-        const rotate = state.currentX * 2.2 * depth + state.currentY * 0.58 + pulse;
+      if (idleFor > 550) {
+        state.targetX = 0;
+        state.targetY = 0;
+      }
 
-        cluster.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${rotate}deg)`;
+      state.currentX += (state.targetX - state.currentX) * 0.055;
+      state.currentY += (state.targetY - state.currentY) * 0.055;
+      const breezeStrength = Math.max(0, 1 - idleFor / 1800);
+
+      canopyLayers.forEach((layer) => {
+        const depth = Number(layer.dataset.depth || 1);
+        const phase = Number(layer.dataset.phase || 0);
+        const breeze = Math.sin(time * 0.00075 + phase * Math.PI * 2) * breezeStrength;
+        const lift = Math.cos(time * 0.00058 + phase * Math.PI) * 0.45 * breezeStrength;
+        const tx = state.currentX * 4.4 * depth + breeze * 0.8 * depth;
+        const ty = state.currentY * 1.7 * depth + lift - Math.abs(state.currentX) * 0.18;
+        const rotate = state.currentX * 0.55 * depth + breeze * 0.18;
+
+        layer.style.transform = `translate3d(${tx}px, ${ty}px, 0) rotate(${rotate}deg)`;
       });
 
-      state.frame = requestAnimationFrame(moveNeedles);
+      if (
+        idleFor > 1900 &&
+        Math.abs(state.currentX) < 0.003 &&
+        Math.abs(state.currentY) < 0.003
+      ) {
+        state.frame = 0;
+        logo.classList.remove("is-active");
+        canopyLayers.forEach((layer) => {
+          layer.style.transform = "translate3d(0, 0, 0) rotate(0deg)";
+        });
+        return;
+      }
+
+      state.frame = requestAnimationFrame(moveCanopy);
     };
 
     const start = () => {
       logo.classList.add("is-active");
       if (!state.frame) {
-        state.frame = requestAnimationFrame(moveNeedles);
+        state.frame = requestAnimationFrame(moveCanopy);
       }
     };
 
     const updateTarget = (event) => {
-      const rect = logo.getBoundingClientRect();
-      const x = (event.clientX - rect.left) / rect.width;
-      const y = (event.clientY - rect.top) / rect.height;
-
-      state.targetX = Math.max(-1, Math.min(1, (x - 0.5) * 2));
-      state.targetY = Math.max(-1, Math.min(1, (y - 0.5) * 2));
+      state.targetX = Math.max(-1, Math.min(1, (event.clientX / window.innerWidth - 0.5) * 2));
+      state.targetY = Math.max(-1, Math.min(1, (event.clientY / window.innerHeight - 0.5) * 2));
+      state.lastPointerMove = performance.now();
+      start();
     };
 
     const rest = () => {
-      cancelAnimationFrame(state.frame);
-      state.frame = 0;
       state.targetX = 0;
       state.targetY = 0;
-      state.currentX = 0;
-      state.currentY = 0;
+      state.lastPointerMove = performance.now() - 700;
       logo.classList.remove("is-active");
-      clusters.forEach((cluster) => {
-        cluster.style.transform = "translate3d(0px, 0px, 0) rotate(0deg)";
-      });
     };
 
-    logo.addEventListener("pointerenter", start);
-    logo.addEventListener("pointermove", updateTarget);
-    logo.addEventListener("pointerleave", rest);
+    window.addEventListener("pointermove", updateTarget, { passive: true });
+    window.addEventListener("blur", rest);
+    document.addEventListener("pointerout", (event) => {
+      if (!event.relatedTarget) {
+        rest();
+      }
+    });
   }
 }
 

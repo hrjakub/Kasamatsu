@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Replaced the simplified hero tree with a detailed hand-drawn umbrella pine logo
+- Added subtle layered canopy movement that follows pointer movement across the page
+- Preserved a stable trunk and reduced-motion fallback for a calm, accessible effect
+
 ## v0.4.0 — 2026-06-07
 
 Staff operations dashboard and preferred-table waiting list.
